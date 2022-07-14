@@ -1,3 +1,5 @@
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -46,3 +48,24 @@ def edit_entry(request, entry_id):
             return redirect('blogs:home')
     context = {'entry': entry, 'title': title, 'form': form}
     return render(request, 'blogs/edit_entry.html', context)
+
+
+def register(request):
+    """Регистрирует нового пользователя."""
+    if request.method != 'POST':
+
+    # Выводит пустую форму регистрации.
+        form = UserCreationForm()
+    else:
+    # Обработка заполненной формы.
+        form = UserCreationForm(data=request.POST)
+
+        if form.is_valid():
+            new_user = form.save()
+        # Выполнение входа и перенаправление на домашнюю страницу.
+            login(request, new_user)
+            return redirect('blogs:home')
+
+    # Вывести пустую или недействительную форму.
+    context = {'form': form}
+    return render(request, 'blogs/register.html', context)

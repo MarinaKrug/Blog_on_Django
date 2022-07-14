@@ -7,6 +7,13 @@
 <body>
 <h3> HELLO</h3>
 <h2> This is my blog</h2>
+{% if user.is_authenticated %}
+        Hello, {{ user.username }}.
+        <a href="{% url 'blogs:logout' %}">log out</a>
+    {% else %}
+        <a href="{% url 'blogs:register' %}">Register</a> -
+        <a href="{% url 'blogs:login' %}">log in</a>
+    {% endif %}
 
 {% block content %}
 
