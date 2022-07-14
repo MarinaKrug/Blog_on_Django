@@ -1,0 +1,23 @@
+{% extends "blogs/base.html" %}
+
+
+{% block content %}
+<table>
+{% for entry in all_entry_blogs %}
+    <tr>
+        <td>{{ entry.date_added }}</td>
+        <td>{{ entry.title }}</td>
+        <td>{{ entry.text }}</td>
+        <td>
+            <a href="{% url 'blogs:edit_entry' entry.id %}">Edit entry:</a>
+        </td>
+    </tr>
+
+{% endfor %}
+     <tr>
+        <td>
+            <a href="{% url 'blogs:new_entry' %}">Add a new entry:</a>
+        </td>
+    </tr>
+</table>
+{% endblock content %}
