@@ -1,5 +1,7 @@
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.http import Http404
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -13,6 +15,8 @@ def index(request):
     return render(request, 'blogs/index.html', context=context)
 
 
+
+@login_required
 def new_entry(request):
     """Добавляет новую запись """
 
@@ -24,19 +28,22 @@ def new_entry(request):
         form = EntryForm(data=request.POST)
         if form.is_valid():
             new_entry = form.save(commit=False)
-            # new_entry.title = title
+            new_entry.owner = request.user
             new_entry.save()
+
             return redirect('blogs:home')
 
     # Вывести пустую или недействительную форму.
     context = {'form': form}
     return render(request, 'blogs/new_entry.html', context)
 
-
+@login_required
 def edit_entry(request, entry_id):
     """Редактирует существующую запись."""
     entry = BlogPost.objects.get(id=entry_id)
     title = entry.title
+    if entry.owner != request.user:
+        raise Http404
     if request.method != 'POST':
     # Исходный запрос; форма заполняется данными текущей записи.
         form = EntryForm(instance=entry)
@@ -53,16 +60,12 @@ def edit_entry(request, entry_id):
 def register(request):
     """Регистрирует нового пользователя."""
     if request.method != 'POST':
-
-    # Выводит пустую форму регистрации.
         form = UserCreationForm()
     else:
-    # Обработка заполненной формы.
         form = UserCreationForm(data=request.POST)
 
         if form.is_valid():
             new_user = form.save()
-        # Выполнение входа и перенаправление на домашнюю страницу.
             login(request, new_user)
             return redirect('blogs:home')
 
